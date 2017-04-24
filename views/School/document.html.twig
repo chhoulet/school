@@ -1,0 +1,193 @@
+{% extends 'AdminBundle:Default:baseAdmin.html.twig' %}
+
+     {% block title %}<title>School tools</title>{% endblock %}
+
+    {% block body %}
+
+	    <div id="page-wrapper">
+            <div class="row">
+                <div class="col-lg-12" style="background-color:#B4DEC9;">
+                    <h1 class="page-header">School tools </h1>
+                </div>
+            </div>
+                <!-- /.col-lg-12 -->
+
+            {% for mes in app.session.flashBag.get('uploadDoc') %}
+                <div class="row">
+                    <div class="col-md-12" id="flash">
+                        {{ mes }}
+                    </div> 
+                </div>
+            {% endfor %} 
+            
+            {% for messag in app.session.flashBag.get('successMail') %}
+                <div class="row">
+                    <div class="col-md-12" id="flash">
+                        {{ messag }}
+                    </div> 
+                </div>
+            {% endfor %}
+
+            {% for message in app.session.flashBag.get('suppDoc') %}
+                <div class="row">
+                    <div class="col-md-12" id="flash">
+                        {{ message }}
+                    </div> 
+                </div>
+            {% endfor %}            
+
+            {% if affich == 2 %}
+                <div class="row">
+                    <div class="col-lg-12" style="margin-top:35px;">
+                        <div class="panel panel-success">
+                            <div class="panel-heading">
+                                <p style="font-weight: bold;">Register a payment for {{ student.getFullName() }}</p>
+                            </div>
+                            <div class="panel-body" style="text-align:center;">
+                                <p>
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModalPayment">
+                                        Payment Form
+                                    </button>
+                                </p>
+                            </div>
+                            <div class="panel-footer">                            
+                            </div>
+                        </div>
+                    </div>
+                </div>          
+            {% endif %}
+
+            <div class="row">
+                <div class="col-lg-12" style="margin-top:35px;">
+                    <div class="panel panel-success">
+                        <div class="panel-heading">
+                            Pill Tabs
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <!-- Nav tabs -->
+                            <ul class="nav nav-pills">
+                                <li class="active"><a href="#home-pills" data-toggle="tab">Upload a document for the school</a>
+                                </li>
+                                <li><a href="#profile-pills" data-toggle="tab">Send an email for all the Students</a>
+                                </li>                                
+                            </ul>
+
+                            <!-- Tab panes -->
+                            <div class="tab-content">
+                                <div class="tab-pane fade in active" id="home-pills">
+                                    <h4>Upload form</h4>
+                                    {{ form_start(form) }}
+                                    {{ tinymce_init() }}
+                                        <div class="col-md-6">{{ form_row(form.name) }}</div>
+                                        <div class="col-md-6 text-center">
+                                            <span style="color: red;font-weight: bold;">PDF files only</span>
+                                            {{ form_widget(form.file) }}
+                                        </div>
+                                        <div class="col-md-12" style="margin-top:25px;">{{ form_row(form.description) }}</div>
+                                        <div class="col-md-12 text-center" style="margin-top:25px;">{{ form_row(form.Valider) }}</div>
+                                    {{ form_end(form)}}
+                                </div>
+                                <div class="tab-pane fade" id="profile-pills">
+                                    <h4>Email form</h4>
+                                    {{ form_start(formMail) }}                            
+                                        <div class="col-md-3">{{ form_row(formMail.subject) }}</div>
+                                        <div class="col-md-12">{{ form_row(formMail.message) }}</div>
+                                        <div class="col-md-12" style="margin-top:25px;text-align: center;">{{ form_row(formMail.submit) }}</div>
+                                    {{ form_end(formMail)}}
+                                </div>                           
+                            </div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+            </div>
+            
+            <!-- /.col-lg-12 -->
+
+            <div class="row">
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <figcaption><h3 style="font-weight: bold; font-size: 22px;border:1 solid black; border-radius:45px;background-color: #67db3d;text-align:center;">List school documents</h3></figcaption>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>File</th>                            
+                                    <th>Type</th>                            
+                                    <th>Actions</th>                            
+                                    <th>View</th>                            
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if listDocs is not null %}
+                                    {% for doc in listDocs %}
+                                       <tr class="odd gradeX">                               
+                                            <td>{{ doc.name|upper}}</td>
+                                            <td>{{ doc.description|capitalize}}</td>
+                                            <td>{{ doc.file}}</td>                                
+                                            <td>
+                                                {% if doc.publicDoc == 1 %}                                
+                                                    <p>Public</p>
+                                                {% elseif doc.publicDoc == 2 %}
+                                                    <p>Private</p>
+                                                {% elseif doc.publicDoc == 3 %}
+                                                    <p>Scholar</p>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <p><a href="{{ path('admin_document_editDoc',{id:doc.id}) }}" title="Edit this document"><i class="fa fa-pencil">  Edit</i></a><br></p>
+                                                <p><a href="{{ path('admin_document_suppDoc',{id:doc.id}) }}" title="Delete this document" onclick="return(confirm('Are you sure you want to delete this document ?'))"><i class="fa fa-times">  Delete</i></a></p>
+                                            </td>
+                                            <td><a href="{{ asset('uploads/documents/' ~ doc.file) }}" target="_blank"> See the document (PDF)</a></td>
+                                        </tr> 
+                                    {% endfor %}
+                                {% endif %}                             
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>                       
+           
+
+        <hr/>
+
+        {% if affich == 2 %}
+            <div class="modal" id="myModalPayment" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Register a payment</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            {{form_start(formPayment)}}
+                            {{form_row(formPayment.payment)}}                           
+                            {{form_row(formPayment.paymentMethod)}}                                                  
+                        </div>
+                        <div class="modal-footer" style="text-align:center;">
+                            {{form_row(formPayment.Valid)}}                                                 
+                            {{form_end(formPayment)}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+    {% endblock %}
+
+    {% block javascript %}        
+        {{ parent() }}
+        <script>
+                $(document).ready(function() {
+                    $('.js-datepicker').datepicker({
+                        format: 'yyyy-mm-dd',
+                        autoclose:true
+                    });                    
+                });
+            </script>
+    {% endblock %}
